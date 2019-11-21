@@ -1,18 +1,46 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <div
+      v-for="frame in frames"
+      :key="frame.id"
+    >
+      <FlexibleFrame :frame="frame" />
+      <button @click="handleUpdateFrame(frame)">update</button>
+    </div>
+    <button @click="handleAddFrame">add</button>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import { Component, Vue } from 'vue-property-decorator'
+import { mapState } from 'vuex'
+import FlexibleFrame from '../components/FlexibleFrame'
+import FrameModel from '../models/Frame'
 
-export default {
-  name: 'home',
+@Component({
   components: {
-    HelloWorld
+    FlexibleFrame
+  },
+  computed: {
+    ...mapState([
+      'frames'
+    ])
+  },
+  methods: {
+    handleAddFrame () {
+      this.$store.commit('addFrame', { input: {} })
+    },
+    handleUpdateFrame (frame) {
+      this.$store.commit('updateFrame', {
+        frame,
+        input: { name: 'ok!' }
+      })
+    }
   }
+})
+export default class Home extends Vue {
 }
 </script>
+
+<style lang="scss" scoped>
+</style>

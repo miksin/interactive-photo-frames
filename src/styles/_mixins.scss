@@ -1,0 +1,10 @@
+@mixin flex($dir: row, $wrap: nowrap) {
+  display: flex;
+  flex-direction: $dir;
+  flex-wrap: $wrap;
+}
+
+@mixin flex-align($justfyContent: center, $alignItems: center) {
+  justify-content: $justfyContent;
+  align-items: $alignItems;
+}

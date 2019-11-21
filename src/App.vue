@@ -1,20 +1,31 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+    <div v-if="routes.length > 0" id="nav">
+      <router-link
+        v-for="route in routes"
+        :key="route.name"
+        :to="route.path"
+      >
+        {{ route.name }}
+      </router-link>
+    </div>
+    <router-view></router-view>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import HelloWorld from './components/HelloWorld.vue'
+import { routes } from './router'
 
-@Component({
-  components: {
-    HelloWorld
+@Component
+export default class App extends Vue {
+  get routes (): { path: string, name: string }[] {
+    return routes.map(r => ({
+      path: r.path,
+      name: r.name
+    }))
   }
-})
-export default class App extends Vue {}
+}
 </script>
 
 <style lang="scss">
@@ -25,5 +36,21 @@ export default class App extends Vue {}
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+#nav {
+  @include flex();
+  @include flex-align();
+  margin: auto;
+
+  a {
+    color: $primary;
+    text-decoration: none;
+  }
+
+  a.router-link-exact-active {
+    color: $success;
+    cursor: default;
+  }
 }
 </style>
