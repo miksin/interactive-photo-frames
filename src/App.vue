@@ -1,15 +1,8 @@
 <template>
   <div id="app">
-    <div v-if="routes.length > 0" id="nav">
-      <router-link
-        v-for="route in routes"
-        :key="route.name"
-        :to="route.path"
-      >
-        {{ route.name }}
-      </router-link>
+    <div id="router-view">
+      <router-view></router-view>
     </div>
-    <router-view></router-view>
   </div>
 </template>
 
@@ -35,13 +28,16 @@ export default class App extends Vue {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  position: relative;
 }
 
 #nav {
   @include flex();
   @include flex-align();
   margin: auto;
+  position: absolute;
+  left: 0;
+  top: 0;
 
   a {
     color: $primary;
@@ -52,5 +48,11 @@ export default class App extends Vue {
     color: $success;
     cursor: default;
   }
+}
+
+#router-view {
+  position: absolute;
+  left: 0;
+  top: 0;
 }
 </style>

@@ -8,3 +8,36 @@
   justify-content: $justfyContent;
   align-items: $alignItems;
 }
+
+@mixin transition($property, $duration: 0.5s, $timing-function: linear, $delay: 0s) {
+  transition-property: $property;
+  transition-duration: $duration;
+  transition-timing-function: $timing-function;
+  transition-delay: $delay;
+}
+
+@mixin bg-grid($interval: 100px, $color: $lightgrey) {
+  background-image:
+    linear-gradient(0deg, $color 1px, transparent 1px),
+    linear-gradient(90deg, $color 1px, transparent 1px);
+  background-size: $interval $interval;
+  background-repeat: repeat;
+}
+
+@mixin btn($fill: false, $main-color: $danger, $contrast-color: $white) {
+  cursor: pointer;
+  outline: none;
+  padding: 12px 24px;
+  font-size: 14px;
+
+  @if $fill {
+    border-style: none;
+    background-color: $main-color;
+    color: $contrast-color;
+  } @else {
+    border-style: solid;
+    border-color: $main-color;
+    background-color: inherit;
+    color: $main-color;
+  }
+}
