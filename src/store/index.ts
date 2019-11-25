@@ -3,14 +3,15 @@ import Vuex from 'vuex'
 import Uuid from 'uuid/v4'
 import FrameModel from '../models/Frame'
 import { menuItems } from '../utils/constants'
-import { IFrameInput, ISize, IMenuInfo, IPosition } from '../utils/interfaces'
+import { IFrameInput, ISize, IMenuInfo, IMouseWrapper, IPosition } from '../utils/interfaces'
 
 Vue.use(Vuex)
 
 interface IState {
   frames: FrameModel[],
   focusFrame: FrameModel | null,
-  menu: IMenuInfo
+  menu: IMenuInfo,
+  mouseWrapper: IMouseWrapper
 }
 
 export default new Vuex.Store({
@@ -20,6 +21,13 @@ export default new Vuex.Store({
     menu: {
       target: null,
       items: menuItems,
+      pos: {
+        x: 0,
+        y: 0
+      }
+    },
+    mouseWrapper: {
+      active: false,
       pos: {
         x: 0,
         y: 0
@@ -59,6 +67,9 @@ export default new Vuex.Store({
     },
     changeMenuTarget (state: IState, { target }: { target: FrameModel | null }) {
       state.menu.target = target
+    },
+    setMouseWrapper (state: IState, val: { active?: boolean, pos?: IPosition }) {
+      Object.assign(state.mouseWrapper, val)
     }
   },
   actions: {

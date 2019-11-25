@@ -28,3 +28,8 @@ export interface IMenuInfo {
   items: IMenuItem[],
   pos: IPosition
 }
+
+export interface IMouseWrapper {
+  active: boolean,
+  pos: IPosition
+}

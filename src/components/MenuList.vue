@@ -1,13 +1,21 @@
 <template>
-  <div class="wrapper" @click.stop="handleCloseMenu">
+  <div
+    class="wrapper"
+    @click.stop="handleCloseMenu"
+    ref="wrapper"
+  >
     <div
       class="menu-list"
-      :style="{ transform: `translate(${pos.x - 150}px, ${pos.y}px)` }"
+      :style="{
+        width: `${width}px`,
+        transform: `translate(${nicelyPos.x}px, ${nicelyPos.y}px)`
+      }"
     >
       <div
         v-for="item in items"
         :key="item.key"
         class="menu-item"
+        :style="{ height: `${itemHeight}px` }"
         @click.stop="handleExecuteMenu"
       >
         {{ item.name }}
@@ -24,6 +32,31 @@ import { IMenuItem, IPosition } from '../utils/interfaces'
 export default class MenuList extends Vue {
   @Prop() items: IMenuItem[]
   @Prop() pos: IPosition
+
+  wrapper: HTMLDivElement | null = null
+  width: number = 150;
+  itemHeight: number = 34;
+
+  mounted () {
+    this.wrapper = this.$refs.wrapper as HTMLDivElement
+  }
+
+  get nicelyPos () {
+    const pos: IPosition = {
+      ...this.pos
+    }
+    if (this.wrapper) {
+      if (pos.x + this.width > this.wrapper.clientWidth) {
+        pos.x -= this.width
+      }
+
+      const height = this.itemHeight * this.items.length
+      if (pos.y + height > this.wrapper.clientHeight) {
+        pos.y -= height
+      }
+    }
+    return pos
+  }
 
   handleCloseMenu () {
     this.$store.commit('changeMenuTarget', { target: null })
@@ -53,7 +86,6 @@ export default class MenuList extends Vue {
   background-color: $white;
   overflow: hidden;
   box-shadow: 0px 0px 5px 1px rgba($color: $grey, $alpha: 0.3);
-  width: 150px;
 
   .menu-item {
     cursor: pointer;

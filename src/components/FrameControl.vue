@@ -1,6 +1,32 @@
 <template>
-  <div class="modal" :class="{ hidden: hidden }">
-    <div class="frame-list">
+  <div
+    class="modal"
+    :class="{
+      hidden: hidden && fold,
+      fold: fold
+    }"
+    :style="{
+      transform: `translate(${pos.x}px, ${pos.y}px)`
+    }"
+  >
+    <div
+      class="appbar"
+      :class="{
+        hidden: hidden && fold,
+        dragging: draggingModal
+      }"
+      @mouseover="handleFocusModal"
+      @mouseleave="handleBlurModal"
+    >
+      <div
+        class="modal-draggable"
+        @mousedown.stop="handleDragModal"
+      />
+      <div class="icon-btn" @click.stop="fold = !fold">
+        <img src="fold-icon.svg" alt="fold">
+      </div>
+    </div>
+    <div class="frame-list" v-show="!fold">
       <div
         v-for="frame in frames"
         :key="frame.id"
@@ -12,7 +38,7 @@
       >
         <div @click.stop="toggleDisplayFrame(frame)">
           <img
-            src="icon-eye.svg"
+            src="eye-icon.svg"
             alt="display"
             :class="{ show: frame.display }"
           >
@@ -31,6 +57,7 @@
     <label
       for="upload-img-input"
       class="btn"
+      v-show="!fold"
     >
       Add New
     </label>
@@ -38,12 +65,18 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue, PropSync, Watch } from 'vue-property-decorator'
 import FrameModel from '../models/Frame'
+import { IPosition } from '../utils/interfaces'
 
 @Component
 export default class FrameControl extends Vue {
-  @Prop({ default: false }) readonly hidden: boolean
+  pos: IPosition = { x: 8, y: 100 }
+  fold: boolean = false
+  hidden: boolean = false
+  draggingModalF: boolean = false
+  draggingOffset: IPosition = { x: 0, y: 0 }
+  blurTimer: any = null
 
   get frames () {
     return this.$store.state.frames
@@ -51,6 +84,62 @@ export default class FrameControl extends Vue {
 
   get focusFrame () {
     return this.$store.state.focusFrame
+  }
+
+  get mousePos (): IPosition {
+    return this.$store.state.mouseWrapper.pos
+  }
+
+  get mouseActive (): boolean {
+    return this.$store.state.mouseWrapper.active
+  }
+
+  set mouseActive (val: boolean) {
+    this.$store.commit('setMouseWrapper', { active: val })
+  }
+
+  get draggingModal () {
+    return this.draggingModalF && this.mouseActive
+  }
+
+  set draggingModal (val: boolean) {
+    this.draggingModalF = val
+    this.mouseActive = val
+  }
+
+  handleDragModal (e: MouseEvent) {
+    this.draggingModal = true
+    this.draggingOffset = {
+      x: e.clientX - this.pos.x,
+      y: e.clientY - this.pos.y
+    }
+  }
+
+  @Watch('mousePos')
+  handleDraggingModal (mousePos: IPosition) {
+    if (this.draggingModal) {
+      this.pos.x = mousePos.x - this.draggingOffset.x
+      this.pos.y = mousePos.y - this.draggingOffset.y
+    }
+  }
+
+  @Watch('mouseActive')
+  handleMouseActive (val: boolean) {
+    if (val === false) {
+      this.draggingModalF = val
+      console.log(this.draggingModalF)
+    }
+  }
+
+  handleFocusModal () {
+    this.hidden = false
+    clearTimeout(this.blurTimer)
+  }
+
+  handleBlurModal () {
+    this.blurTimer = setTimeout(() => {
+      this.hidden = true
+    }, 1000)
   }
 
   handleAddFrame () {
@@ -120,19 +209,57 @@ export default class FrameControl extends Vue {
 
   background-color: $white;
   box-shadow: 0px 1px 15px -5px rgba($color: $grey, $alpha: 0.3);
+  overflow: hidden;
   position: fixed;
-  right: 12px;
-  top: 50%;
+  left: 0;
+  top: 0;
   width: 150px;
   height: 80vh;
-  transform: translateY(-50%);
   @include transition(
-    $property: transform,
+    $property: height,
     $duration: 0.2s
   );
 
   &.hidden {
-    transform: translate(calc(100% + 8px), -50%);
+    box-shadow: none;
+  }
+
+  &.fold {
+    height: $appbar-height;
+  }
+}
+
+.appbar {
+  width: 100%;
+  height: $appbar-height;
+  background-color: $danger;
+  padding: 4px 8px;
+  @include flex();
+  @include flex-align();
+
+  opacity: 1;
+  @include transition(opacity, 0.2s);
+  &.hidden {
+    opacity: 0.1;
+  }
+
+  .modal-draggable {
+    height: 100%;
+    flex-grow: 1;
+    cursor: grab;
+    &.dragging {
+      cursor: grabbing;
+    }
+  }
+
+  .icon-btn {
+    @include flex();
+    @include flex-align();
+    cursor: pointer;
+  }
+
+  img {
+    width: $appbar-height * 0.6;
   }
 }
 
@@ -149,7 +276,6 @@ export default class FrameControl extends Vue {
   padding: 4px 0;
   box-shadow: 0px 0px 3px -1px rgba($color: $grey, $alpha: 0.3);
   cursor: pointer;
-  overflow-x: hidden;
 
   div {
     margin: auto 4px;
