@@ -27,4 +27,9 @@ export default class Frame {
   update (input: IFrameInput): void {
     Object.assign(this, input)
   }
+
+  move (pos: IPosition): void {
+    this.position.x = pos.x
+    this.position.y = pos.y
+  }
 }

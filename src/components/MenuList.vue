@@ -16,9 +16,17 @@
         :key="item.key"
         class="menu-item"
         :style="{ height: `${itemHeight}px` }"
-        @click.stop="handleExecuteMenu"
+        @click.stop="handleExecuteMenu(item.key)"
       >
-        {{ item.name }}
+        <img
+          v-if="item.icon !== undefined"
+          :style="{ height: `${itemHeight * 0.7}px` }"
+          :src="item.icon"
+          :alt="item.name"
+        >
+        <p v-else>
+          {{ item.name }}
+        </p>
       </div>
     </div>
   </div>
@@ -36,10 +44,6 @@ export default class MenuList extends Vue {
   wrapper: HTMLDivElement | null = null
   width: number = 150;
   itemHeight: number = 34;
-
-  mounted () {
-    this.wrapper = this.$refs.wrapper as HTMLDivElement
-  }
 
   get nicelyPos () {
     const pos: IPosition = {
@@ -63,7 +67,13 @@ export default class MenuList extends Vue {
   }
 
   handleExecuteMenu (key: string) {
-    console.log(key)
+    this.$emit('click-item', key)
+  }
+
+  mounted () {
+    // Using v-if or v-show with the wrapper might cause $refs.wrapper to undefined.
+    // Bind these conditions outside rather than on the wrapper directly
+    this.wrapper = this.$refs.wrapper as HTMLDivElement
   }
 }
 </script>
@@ -88,12 +98,18 @@ export default class MenuList extends Vue {
   box-shadow: 0px 0px 5px 1px rgba($color: $grey, $alpha: 0.3);
 
   .menu-item {
+    @include flex();
+    @include flex-align();
     cursor: pointer;
     padding: 8px 0;
 
     &:hover {
       background-color: $danger;
       color: $white;
+
+      img {
+        filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+      }
     }
   }
 }

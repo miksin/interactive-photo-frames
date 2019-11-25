@@ -6,6 +6,7 @@
       fold: fold
     }"
     :style="{
+      width: `${width}px`,
       transform: `translate(${pos.x}px, ${pos.y}px)`
     }"
   >
@@ -59,7 +60,7 @@
       class="btn"
       v-show="!fold"
     >
-      Add New
+      Add Image
     </label>
   </div>
 </template>
@@ -71,15 +72,16 @@ import { IPosition } from '../utils/interfaces'
 
 @Component
 export default class FrameControl extends Vue {
-  pos: IPosition = { x: 8, y: 100 }
+  width: number = 150
+  pos: IPosition = { x: window.innerWidth - this.width - 8, y: 8 }
   fold: boolean = false
   hidden: boolean = false
   draggingModalF: boolean = false
   draggingOffset: IPosition = { x: 0, y: 0 }
   blurTimer: any = null
 
-  get frames () {
-    return this.$store.state.frames
+  get frames (): FrameModel[] {
+    return this.$store.state.frames.slice().reverse()
   }
 
   get focusFrame () {
@@ -127,7 +129,6 @@ export default class FrameControl extends Vue {
   handleMouseActive (val: boolean) {
     if (val === false) {
       this.draggingModalF = val
-      console.log(this.draggingModalF)
     }
   }
 
@@ -156,7 +157,7 @@ export default class FrameControl extends Vue {
     this.$store.commit('switchFocusFrame', { frame: frame })
   }
 
-  handleOpenMenu (e: any, frame: FrameModel) {
+  handleOpenMenu (e: MouseEvent, frame: FrameModel) {
     const pos = {
       x: e.clientX,
       y: e.clientY
@@ -213,7 +214,6 @@ export default class FrameControl extends Vue {
   position: fixed;
   left: 0;
   top: 0;
-  width: 150px;
   height: 80vh;
   @include transition(
     $property: height,
@@ -276,6 +276,7 @@ export default class FrameControl extends Vue {
   padding: 4px 0;
   box-shadow: 0px 0px 3px -1px rgba($color: $grey, $alpha: 0.3);
   cursor: pointer;
+  overflow: hidden;
 
   div {
     margin: auto 4px;

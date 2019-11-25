@@ -20,7 +20,9 @@ export interface IPosition {
 
 export interface IMenuItem {
   key: string,
-  name: string
+  name: string,
+  icon?: string,
+  disable: boolean
 }
 
 export interface IMenuInfo {
