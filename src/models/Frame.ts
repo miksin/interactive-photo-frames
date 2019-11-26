@@ -24,6 +24,14 @@ export default class Frame {
     this.display = true
   }
 
+  get aspectRatio (): number {
+    const { width, height } = this.naturalSize
+    if (height > 0) {
+      return width / height
+    }
+    return 0.0
+  }
+
   update (input: IFrameInput): void {
     Object.assign(this, input)
   }

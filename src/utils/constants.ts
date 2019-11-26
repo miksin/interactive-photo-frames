@@ -9,6 +9,24 @@ export enum menuKeys {
   Bottom = 'bottom'
 }
 
+export enum mouseEvents {
+  None,
+  DragFrameControlPanel,
+  DragFrame,
+  ResizeFrame
+}
+
+export enum corners {
+  Left = 'left',
+  LeftTop = 'left-top',
+  Top = 'top',
+  RightTop = 'right-top',
+  Right = 'right',
+  RightBottom = 'right-bottom',
+  Bottom = 'bottom',
+  LeftBottom = 'left-bottom'
+}
+
 export const menuItems: IMenuItem[] = [
   {
     key: menuKeys.Delete,

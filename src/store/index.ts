@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import Uuid from 'uuid/v4'
 import FrameModel from '../models/Frame'
-import { menuItems, menuKeys } from '../utils/constants'
+import { menuItems, menuKeys, mouseEvents } from '../utils/constants'
 import { IFrameInput, ISize, IMenuInfo, IMouseWrapper, IPosition, IMenuItem } from '../utils/interfaces'
 
 Vue.use(Vuex)
@@ -27,7 +27,7 @@ export default new Vuex.Store({
       }
     },
     mouseWrapper: {
-      active: false,
+      event: mouseEvents.None,
       pos: {
         x: 0,
         y: 0

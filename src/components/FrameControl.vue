@@ -14,7 +14,7 @@
       class="appbar"
       :class="{
         hidden: hidden && fold,
-        dragging: draggingModal
+        dragging: isDraggingModal
       }"
       @mouseover="handleFocusModal"
       @mouseleave="handleBlurModal"
@@ -27,24 +27,39 @@
         <img src="fold-icon.svg" alt="fold">
       </div>
     </div>
-    <div class="frame-list" v-show="!fold">
+    <div
+      class="frame-list"
+      :style="{
+        height: `${listHeight}px`
+      }"
+      v-show="!fold"
+      ref="frameListRef"
+    >
       <div
         v-for="frame in frames"
         :key="frame.id"
         class="frame-preview"
         :class="{ highlight: focusFrame === frame }"
+        :style="{
+          margin: `${itemMargin}px 0`,
+          height: `${itemHeight}px`,
+          minHeight: `${itemHeight}px`
+        }"
         @mouseover="handleFocusFrame(frame)"
         @mouseout="handleFocusFrame(null)"
         @click="e => handleOpenMenu(e, frame)"
       >
-        <div @click.stop="toggleDisplayFrame(frame)">
+        <div
+          title="hidden/show"
+          @click.stop="toggleDisplayFrame(frame)"
+        >
           <img
             src="eye-icon.svg"
             alt="display"
             :class="{ show: frame.display }"
           >
         </div>
-        <div>{{ frame.name }}</div>
+        <div :title="frame.name">{{ frame.name }}</div>
       </div>
     </div>
     <input
@@ -66,19 +81,31 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, PropSync, Watch } from 'vue-property-decorator'
+import { Component, Prop, Vue, Ref, Watch } from 'vue-property-decorator'
 import FrameModel from '../models/Frame'
 import { IPosition } from '../utils/interfaces'
+import { mouseEvents } from '../utils/constants'
 
 @Component
 export default class FrameControl extends Vue {
+  // appearance
   width: number = 150
+  itemShowLimit: number = 10
+  itemHeight: number = 30
+  itemMargin: number = 4
+
+  get listHeight (): number {
+    return (this.itemHeight + 2 * this.itemMargin) * this.itemShowLimit
+  }
+
+  // local states
   pos: IPosition = { x: window.innerWidth - this.width - 8, y: 8 }
   fold: boolean = false
   hidden: boolean = false
-  draggingModalF: boolean = false
   draggingOffset: IPosition = { x: 0, y: 0 }
   blurTimer: any = null
+
+  @Ref() readonly frameListRef!: HTMLDivElement
 
   get frames (): FrameModel[] {
     return this.$store.state.frames.slice().reverse()
@@ -92,25 +119,26 @@ export default class FrameControl extends Vue {
     return this.$store.state.mouseWrapper.pos
   }
 
-  get mouseActive (): boolean {
-    return this.$store.state.mouseWrapper.active
+  set mousePos (val: IPosition) {
+    this.$store.commit('setMouseWrapper', { pos: val })
   }
 
-  set mouseActive (val: boolean) {
-    this.$store.commit('setMouseWrapper', { active: val })
+  get isDraggingModal (): boolean {
+    return this.$store.state.mouseWrapper.event === mouseEvents.DragFrameControlPanel
   }
 
-  get draggingModal () {
-    return this.draggingModalF && this.mouseActive
-  }
-
-  set draggingModal (val: boolean) {
-    this.draggingModalF = val
-    this.mouseActive = val
+  set isDraggingModal (val: boolean) {
+    const event = val ? mouseEvents.DragFrameControlPanel : mouseEvents.None
+    this.$store.commit('setMouseWrapper', { event })
   }
 
   handleDragModal (e: MouseEvent) {
-    this.draggingModal = true
+    // update mouse position before active
+    this.mousePos = {
+      x: e.clientX,
+      y: e.clientY
+    }
+    this.isDraggingModal = true
     this.draggingOffset = {
       x: e.clientX - this.pos.x,
       y: e.clientY - this.pos.y
@@ -119,16 +147,18 @@ export default class FrameControl extends Vue {
 
   @Watch('mousePos')
   handleDraggingModal (mousePos: IPosition) {
-    if (this.draggingModal) {
+    if (this.isDraggingModal) {
       this.pos.x = mousePos.x - this.draggingOffset.x
       this.pos.y = mousePos.y - this.draggingOffset.y
     }
   }
 
-  @Watch('mouseActive')
-  handleMouseActive (val: boolean) {
-    if (val === false) {
-      this.draggingModalF = val
+  handleDragPreview (e: MouseEvent) {
+    if (this.frameListRef && this.frameListRef.childNodes.length > 0) {
+      const firstNode = this.frameListRef.childNodes[0] as HTMLDivElement
+      const targetNode = e.currentTarget as HTMLDivElement
+      const topDiff = targetNode.offsetTop - firstNode.offsetTop
+      console.log(topDiff, targetNode)
     }
   }
 
@@ -141,16 +171,6 @@ export default class FrameControl extends Vue {
     this.blurTimer = setTimeout(() => {
       this.hidden = true
     }, 1000)
-  }
-
-  handleAddFrame () {
-    this.$store.commit('addFrame', { input: {
-      url: 'example.png',
-      position: {
-        x: Math.floor(Math.random() * window.innerWidth),
-        y: Math.floor(Math.random() * window.innerHeight)
-      }
-    } })
   }
 
   handleFocusFrame (frame: FrameModel) {
@@ -214,7 +234,7 @@ export default class FrameControl extends Vue {
   position: fixed;
   left: 0;
   top: 0;
-  height: 80vh;
+  height: auto;
   @include transition(
     $property: height,
     $duration: 0.2s
@@ -272,13 +292,13 @@ export default class FrameControl extends Vue {
 .frame-preview {
   @include flex();
   @include flex-align(flex-start, center);
-  margin: 4px;
   padding: 4px 0;
   box-shadow: 0px 0px 3px -1px rgba($color: $grey, $alpha: 0.3);
   cursor: pointer;
   overflow: hidden;
 
   div {
+    white-space: nowrap;
     margin: auto 4px;
   }
 
@@ -291,7 +311,7 @@ export default class FrameControl extends Vue {
     width: 18px;
     height: 18px;
     margin: auto;
-    opacity: 0;
+    opacity: 0.2;
 
     &.show {
       opacity: 1;

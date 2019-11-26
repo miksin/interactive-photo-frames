@@ -2,6 +2,7 @@
   <div
     v-show="active"
     class="mouse-wrapper"
+    :class="{ dragging: active }"
     @mousemove="handleMouseMove"
     @mouseup="handleMouseUp"
   />
@@ -10,15 +11,18 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { IPosition } from '../utils/interfaces'
+import { mouseEvents } from '../utils/constants'
 
 @Component
 export default class MouseWrapper extends Vue {
   get active (): boolean {
-    return this.$store.state.mouseWrapper.active
+    return this.$store.state.mouseWrapper.event !== mouseEvents.None
   }
 
   set active (val: boolean) {
-    this.$store.commit('setMouseWrapper', { active: val })
+    if (!val) {
+      this.$store.commit('setMouseWrapper', { event: mouseEvents.None })
+    }
   }
 
   get pos (): IPosition {
@@ -49,5 +53,9 @@ export default class MouseWrapper extends Vue {
   top: 0;
   width: 100vw;
   height: 100vh;
+
+  &.dragging {
+    cursor: grabbing;
+  }
 }
 </style>

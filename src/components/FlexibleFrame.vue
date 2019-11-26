@@ -2,26 +2,33 @@
   <div
     class="frame"
     :class="{
-      highlight: focused,
-      dragging: isDragging
+      highlight: focused
     }"
     :style="{
-      transform: `translate(${frame.position.x}px, ${frame.position.y}px)`,
-      width: `${frame.size.width}px`,
-      height: `${frame.size.height}px`,
+      transform: `translate(${framePos.x}px, ${framePos.y}px)`,
+      width: `${frame.size.width + 2 * padding}px`,
+      height: `${frame.size.height + 2 * padding}px`,
+      padding: `${padding}px`
     }"
     @mouseover="handleFocusFrame(frame)"
     @mouseout="handleFocusFrame(null)"
-    @mousedown="handleDragFrame"
+    @mousewheel="handleScrollFrame"
   >
     <div class="content">
       <img
-        :class="{ dragging: isDragging }"
+        :title="frame.name"
         :src="frame.url"
         :alt="frame.name"
         ref="img"
+        @mousedown.stop="handleDragFrame"
         @load="handleImgLoad(frame)"
       >
+      <div
+        v-for="node in resizeNodes"
+        :key="node.key"
+        :style="node.style"
+        @mousedown.stop="e => handleResizeFrame(e, node.key)"
+      />
     </div>
   </div>
 </template>
@@ -30,31 +37,25 @@
 import { Component, Prop, Ref, Vue, Watch } from 'vue-property-decorator'
 import FrameModel from '../models/Frame'
 import { IPosition } from '../utils/interfaces'
+import { cornerStyles } from '../utils/helpers'
 
 @Component
 export default class App extends Vue {
   @Prop(FrameModel) frame: FrameModel
   @Prop({ default: false }) readonly focused: boolean
+  @Prop({ default: 0 }) readonly padding: number
 
   @Ref('img') readonly imgRef!: HTMLImageElement
 
-  dragging: boolean = false
-  dragOffset: IPosition = { x: 0, y: 0 }
-
-  get mousePos (): IPosition {
-    return this.$store.state.mouseWrapper.pos
+  get framePos (): IPosition {
+    return {
+      x: this.frame.position.x - this.padding,
+      y: this.frame.position.y - this.padding
+    }
   }
 
-  get mouseActive (): boolean {
-    return this.$store.state.mouseWrapper.active
-  }
-
-  set mouseActive (val: boolean) {
-    this.$store.commit('setMouseWrapper', { active: val })
-  }
-
-  get isDragging (): boolean {
-    return this.mousePos && this.dragging
+  get resizeNodes () {
+    return cornerStyles(this.frame.size, this.padding)
   }
 
   // resize image after loaded
@@ -77,32 +78,42 @@ export default class App extends Vue {
   }
 
   handleDragFrame (e: MouseEvent) {
-    this.mouseActive = true
-    this.dragging = true
-    this.dragOffset = {
-      x: e.clientX - this.frame.position.x,
-      y: e.clientY - this.frame.position.y
-    }
+    // update mouse position before active
+    this.$store.commit('setMouseWrapper', {
+      pos: {
+        x: e.clientX,
+        y: e.clientY
+      }
+    })
+    this.$emit('drag-frame', {
+      frame: this.frame,
+      offset: {
+        x: e.clientX - this.framePos.x,
+        y: e.clientY - this.framePos.y
+      }
+    })
   }
 
-  @Watch('mousePos')
-  handleDragging (mousePos: IPosition) {
-    if (this.isDragging) {
-      this.$store.commit('moveFrame', {
-        frame: this.frame,
-        pos: {
-          x: mousePos.x - this.dragOffset.x,
-          y: mousePos.y - this.dragOffset.y
-        }
-      })
-    }
+  handleResizeFrame (e: MouseEvent, corner: number) {
+    // update mouse position before active
+    this.$store.commit('setMouseWrapper', {
+      pos: {
+        x: e.clientX,
+        y: e.clientY
+      }
+    })
+    this.$emit('resize-frame', {
+      frame: this.frame,
+      corner,
+      offset: {
+        x: e.clientX - this.framePos.x,
+        y: e.clientY - this.framePos.y
+      }
+    })
   }
 
-  @Watch('mouseActive')
-  handleMouseActive (val: boolean) {
-    if (val === false) {
-      this.dragging = val
-    }
+  handleScrollFrame (e: WheelEvent) {
+    console.log(e.deltaMode, e.deltaY)
   }
 }
 </script>
@@ -113,13 +124,12 @@ export default class App extends Vue {
   @include flex-align();
   @include transition(
     $property: transform,
-    $duration: 0.3s,
+    $duration: 0.1s,
     $timing-function: linear
   );
 
   left: 0;
   top: 0;
-  padding: 4px;
   box-shadow: 1px 1px 5px -1px rgba($color: $grey, $alpha: 0.3);
   background-color: $white;
   position: absolute;
@@ -141,7 +151,7 @@ export default class App extends Vue {
 
   cursor: grab;
   &.dragging {
-    cursor: grabbing;
+    opacity: 0.3;
   }
 }
 </style>

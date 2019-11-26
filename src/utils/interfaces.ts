@@ -32,6 +32,6 @@ export interface IMenuInfo {
 }
 
 export interface IMouseWrapper {
-  active: boolean,
+  event: number,
   pos: IPosition
 }
