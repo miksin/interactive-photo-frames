@@ -1,11 +1,12 @@
 import uuid from 'uuid/v4'
 import {
   IFrameInput,
-  IPosition,
-  ISize,
   IQuadrants,
   IDiagonals
 } from '../utils/interfaces'
+import Size from './Size'
+import Position from './Position'
+import { Diagonals } from './types'
 import { framePadding, corners } from '../utils/constants'
 
 export default class Frame {
@@ -13,30 +14,46 @@ export default class Frame {
   name: string
   url?: string
   display: boolean
-  position: IPosition
-  size: ISize
-  naturalSize: ISize
+  mirror: boolean
+  position: Position
+  size: Size
+  naturalSize: Size
+  padding: number
+  scale: number // scaling relative to naturalSize
+  offset: Position // position relative to position
 
   constructor (input?: IFrameInput) {
     this.id = uuid()
     this.name = 'new frame'
     this.url = ''
-    this.position = { x: 0, y: 0 }
-    this.size = { width: 100, height: 100 }
-    this.naturalSize = { width: 100, height: 100 }
+    this.position = new Position()
+    this.size = new Size()
+    this.naturalSize = new Size()
     this.display = true
+    this.mirror = false
+    this.padding = framePadding
+    this.scale = 1
+    this.offset = new Size()
 
     if (input) {
       this.update(input)
     }
   }
 
+  get outerSize (): Size {
+    return this.size.clone().expand(this.padding)
+  }
+
+  get innerSize (): ISize {
+    return this.size.clone().scale(this.scale)
+  }
+
   get aspectRatio (): number {
-    const { width, height } = this.naturalSize
-    if (height > 0) {
-      return width / height
-    }
-    return 0.0
+    return this.naturalSize.aspectRatio
+  }
+
+  get outerPosition (): Position {
+    return this.position.clone().move(-this.padding, -this.padding)
   }
 
   get cornerPositions (): IQuadrants {

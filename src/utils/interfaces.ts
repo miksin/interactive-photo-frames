@@ -7,6 +7,9 @@ export interface IFrameInput {
   position?: IPosition,
   size?: ISize
   naturalSize?: ISize
+  padding?: number
+  scale?: number
+  offset?: IPosition
 }
 
 export interface ISize {
