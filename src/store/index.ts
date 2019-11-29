@@ -2,8 +2,9 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import Uuid from 'uuid/v4'
 import FrameModel from '../models/Frame'
+import MouseWrapperModel from '../models/MouseWrapper'
 import { menuItems, menuKeys, mouseEvents } from '../utils/constants'
-import { IFrameInput, ISize, IMenuInfo, IMouseWrapper, IPosition, IMenuItem } from '../utils/interfaces'
+import { IFrameInput, ISize, IMenuInfo, IPosition, IMenuItem, IMouseWrapperInput, IDiagonals } from '../utils/interfaces'
 
 Vue.use(Vuex)
 
@@ -11,7 +12,7 @@ interface IState {
   frames: FrameModel[],
   focusFrame: FrameModel | null,
   menu: IMenuInfo,
-  mouseWrapper: IMouseWrapper
+  mouseWrapper: MouseWrapperModel
 }
 
 export default new Vuex.Store({
@@ -26,13 +27,7 @@ export default new Vuex.Store({
         y: 0
       }
     },
-    mouseWrapper: {
-      event: mouseEvents.None,
-      pos: {
-        x: 0,
-        y: 0
-      }
-    }
+    mouseWrapper: new MouseWrapperModel()
   },
   mutations: {
     addFrame (state: IState, { input }: { input: IFrameInput }) {
@@ -49,6 +44,9 @@ export default new Vuex.Store({
     },
     moveFrame (state: IState, { frame, pos }: { frame: FrameModel, pos: IPosition }) {
       frame.move(pos)
+    },
+    resizeFrame (state: IState, { frame, val }: { frame: FrameModel, val: IDiagonals }) {
+      frame.diagonals = val
     },
     swapFrames (state: IState, { posA, posB }: { posA: number, posB: number }) {
       if (posA < 0 || posA >= state.frames.length) return
@@ -84,8 +82,11 @@ export default new Vuex.Store({
         state.menu.items[index].icon = url
       }
     },
-    setMouseWrapper (state: IState, val: { active?: boolean, pos?: IPosition }) {
-      Object.assign(state.mouseWrapper, val)
+    setMouseWrapper (state: IState, val: IMouseWrapperInput) {
+      state.mouseWrapper.update(val)
+    },
+    resetMouseWrapper (state: IState) {
+      state.mouseWrapper.reset()
     }
   },
   actions: {

@@ -84,7 +84,7 @@
 import { Component, Prop, Vue, Ref, Watch } from 'vue-property-decorator'
 import FrameModel from '../models/Frame'
 import { IPosition } from '../utils/interfaces'
-import { mouseEvents } from '../utils/constants'
+import { mouseEvents, corners } from '../utils/constants'
 
 @Component
 export default class FrameControl extends Vue {
@@ -102,7 +102,6 @@ export default class FrameControl extends Vue {
   pos: IPosition = { x: window.innerWidth - this.width - 8, y: 8 }
   fold: boolean = false
   hidden: boolean = false
-  draggingOffset: IPosition = { x: 0, y: 0 }
   blurTimer: any = null
 
   @Ref() readonly frameListRef!: HTMLDivElement
@@ -116,11 +115,7 @@ export default class FrameControl extends Vue {
   }
 
   get mousePos (): IPosition {
-    return this.$store.state.mouseWrapper.pos
-  }
-
-  set mousePos (val: IPosition) {
-    this.$store.commit('setMouseWrapper', { pos: val })
+    return this.$store.state.mouseWrapper.position
   }
 
   get isDraggingModal (): boolean {
@@ -133,23 +128,24 @@ export default class FrameControl extends Vue {
   }
 
   handleDragModal (e: MouseEvent) {
-    // update mouse position before active
-    this.mousePos = {
-      x: e.clientX,
-      y: e.clientY
-    }
-    this.isDraggingModal = true
-    this.draggingOffset = {
-      x: e.clientX - this.pos.x,
-      y: e.clientY - this.pos.y
-    }
+    this.$store.commit('setMouseWrapper', {
+      pos: { // update mouse position before active
+        x: e.clientX,
+        y: e.clientY
+      },
+      event: mouseEvents.DragFrameControlPanel,
+      basis: {
+        x: e.clientX - this.pos.x,
+        y: e.clientY - this.pos.y
+      },
+      trackCorner: corners.LeftTop
+    })
   }
 
   @Watch('mousePos')
-  handleDraggingModal (mousePos: IPosition) {
+  handleDraggingModal (val: IPosition) {
     if (this.isDraggingModal) {
-      this.pos.x = mousePos.x - this.draggingOffset.x
-      this.pos.y = mousePos.y - this.draggingOffset.y
+      this.pos = val
     }
   }
 

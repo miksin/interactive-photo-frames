@@ -38,6 +38,7 @@ import { Component, Prop, Ref, Vue, Watch } from 'vue-property-decorator'
 import FrameModel from '../models/Frame'
 import { IPosition } from '../utils/interfaces'
 import { cornerStyles } from '../utils/helpers'
+import { corners } from '../utils/constants'
 
 @Component
 export default class App extends Vue {
@@ -78,37 +79,17 @@ export default class App extends Vue {
   }
 
   handleDragFrame (e: MouseEvent) {
-    // update mouse position before active
-    this.$store.commit('setMouseWrapper', {
-      pos: {
-        x: e.clientX,
-        y: e.clientY
-      }
-    })
     this.$emit('drag-frame', {
       frame: this.frame,
-      offset: {
-        x: e.clientX - this.framePos.x,
-        y: e.clientY - this.framePos.y
-      }
+      e
     })
   }
 
-  handleResizeFrame (e: MouseEvent, corner: number) {
-    // update mouse position before active
-    this.$store.commit('setMouseWrapper', {
-      pos: {
-        x: e.clientX,
-        y: e.clientY
-      }
-    })
+  handleResizeFrame (e: MouseEvent, corner: corners) {
     this.$emit('resize-frame', {
       frame: this.frame,
       corner,
-      offset: {
-        x: e.clientX - this.framePos.x,
-        y: e.clientY - this.framePos.y
-      }
+      e
     })
   }
 
@@ -122,17 +103,13 @@ export default class App extends Vue {
 .frame {
   @include flex();
   @include flex-align();
-  @include transition(
-    $property: transform,
-    $duration: 0.1s,
-    $timing-function: linear
-  );
 
   left: 0;
   top: 0;
   box-shadow: 1px 1px 5px -1px rgba($color: $grey, $alpha: 0.3);
   background-color: $white;
   position: absolute;
+  overflow: hidden;
 
   .content {
     width: 100%;

@@ -41,7 +41,7 @@ export default class MouseWrapper extends Vue {
   }
 
   handleMouseUp () {
-    this.active = false
+    this.$store.commit('resetMouseWrapper')
   }
 }
 </script>
@@ -56,6 +56,13 @@ export default class MouseWrapper extends Vue {
 
   &.dragging {
     cursor: grabbing;
+  }
+
+  .phantom {
+    left: 0;
+    top: 0;
+    position: absolute;
+    box-shadow: 0px 0px 0px 3px rgba($color: $success, $alpha: 1.0);
   }
 }
 </style>

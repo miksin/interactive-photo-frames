@@ -1,4 +1,5 @@
 import FrameModel from '../models/Frame'
+import { corners } from './constants';
 
 export interface IFrameInput {
   name?: string,
@@ -34,4 +35,26 @@ export interface IMenuInfo {
 export interface IMouseWrapper {
   event: number,
   pos: IPosition
+}
+
+export interface IMouseWrapperInput {
+  event?: number,
+  pos?: IPosition,
+  offset?: IPosition
+}
+
+export interface IQuadrants {
+  [corners.Left]: IPosition,
+  [corners.LeftTop]: IPosition,
+  [corners.Top]: IPosition,
+  [corners.RightTop]: IPosition,
+  [corners.Right]: IPosition,
+  [corners.RightBottom]: IPosition,
+  [corners.Bottom]: IPosition,
+  [corners.LeftBottom]: IPosition
+}
+
+export interface IDiagonals {
+  [corners.LeftTop]: IPosition,
+  [corners.RightBottom]: IPosition
 }
