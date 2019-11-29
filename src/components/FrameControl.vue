@@ -99,7 +99,7 @@ export default class FrameControl extends Vue {
   }
 
   // local states
-  pos: IPosition = { x: window.innerWidth - this.width - 8, y: 8 }
+  pos: IPosition = { x: 8, y: 8 }
   fold: boolean = false
   hidden: boolean = false
   blurTimer: any = null

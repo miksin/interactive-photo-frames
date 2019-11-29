@@ -1,5 +1,5 @@
 import FrameModel from '../models/Frame'
-import { corners } from './constants';
+import { corners } from './constants'
 
 export interface IFrameInput {
   name?: string,

@@ -17,14 +17,18 @@ export default class Frame {
   size: ISize
   naturalSize: ISize
 
-  constructor (input: IFrameInput) {
+  constructor (input?: IFrameInput) {
     this.id = uuid()
-    this.name = input.name || 'new frame'
-    this.url = input.url
-    this.position = input.position || { x: 0, y: 0 }
-    this.size = input.size || { width: 100, height: 100 }
-    this.naturalSize = input.naturalSize || { width: 100, height: 100 }
+    this.name = 'new frame'
+    this.url = ''
+    this.position = { x: 0, y: 0 }
+    this.size = { width: 100, height: 100 }
+    this.naturalSize = { width: 100, height: 100 }
     this.display = true
+
+    if (input) {
+      this.update(input)
+    }
   }
 
   get aspectRatio (): number {

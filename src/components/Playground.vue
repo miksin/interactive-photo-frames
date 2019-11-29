@@ -45,6 +45,10 @@ export default class Playground extends Vue {
     return this.$store.state.mouseWrapper.diagonals
   }
 
+  get mouseTrackCorner (): corners {
+    return this.$store.state.mouseWrapper.trackCorner
+  }
+
   get dragActive (): boolean {
     return this.$store.state.mouseWrapper.event === mouseEvents.DragFrame
   }
@@ -79,17 +83,35 @@ export default class Playground extends Vue {
 
   @Watch('mousePos')
   handleMouseMove (val: IPosition) {
+    const frame = this.mutatedFrame || new FrameModel()
+
     if (this.isDragging) {
       this.$store.commit('moveFrame', {
-        frame: this.mutatedFrame,
+        frame,
         pos: val
       })
     }
 
     if (this.isResizing) {
+      const diagonals = this.mouseDiagonals
+
+      // fix horizontal or vertical changes
+      switch (this.mouseTrackCorner) {
+        case corners.Left:
+        case corners.Right:
+          diagonals[corners.LeftTop].y = frame.position.y
+          diagonals[corners.RightBottom].y = frame.diagonals[corners.RightBottom].y
+          break
+        case corners.Top:
+        case corners.Bottom:
+          diagonals[corners.LeftTop].x = frame.position.x
+          diagonals[corners.RightBottom].x = frame.diagonals[corners.RightBottom].x
+          break
+      }
+
       this.$store.commit('resizeFrame', {
-        frame: this.mutatedFrame,
-        val: this.mouseDiagonals
+        frame,
+        val: diagonals
       })
     }
   }

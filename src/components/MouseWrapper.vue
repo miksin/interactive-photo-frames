@@ -11,7 +11,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { IPosition } from '../utils/interfaces'
-import { mouseEvents } from '../utils/constants'
+import { mouseEvents, corners } from '../utils/constants'
 
 @Component
 export default class MouseWrapper extends Vue {
@@ -23,6 +23,10 @@ export default class MouseWrapper extends Vue {
     if (!val) {
       this.$store.commit('setMouseWrapper', { event: mouseEvents.None })
     }
+  }
+
+  get trackCorner (): corners {
+    return this.$store.state.mouseWrapper.trackCorner
   }
 
   get pos (): IPosition {

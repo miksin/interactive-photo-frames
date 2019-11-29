@@ -33,6 +33,10 @@ export default class MouseWrapper {
   get diagonals (): IDiagonals {
     switch (this.trackCorner) {
       case corners.LeftTop:
+        return {
+          [corners.LeftTop]: this.basis,
+          [corners.RightBottom]: this.pos
+        }
       case corners.Left:
       case corners.Top:
         return {
