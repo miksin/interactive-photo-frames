@@ -22,8 +22,8 @@ import MenuList from '../components/MenuList.vue'
 import MouseWrapper from '../components/MouseWrapper.vue'
 import KeyNavigator from '../components/KeyNavigator.vue'
 import FrameModel from '../models/Frame'
-import { IPosition, IMenuItem } from '../utils/interfaces'
-import { menuKeys } from '../utils/constants'
+import { IPosition, IMenuItem } from '../models/interfaces'
+import { menuKeys } from '../models/enums'
 
 @Component({
   components: {

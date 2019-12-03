@@ -2,13 +2,13 @@ import uuid from 'uuid/v4'
 import {
   IPosition,
   IFrameInput,
-  IQuadrants,
-  IDiagonals
-} from '../utils/interfaces'
+  IQuadrants
+} from '../models/interfaces'
 import Size from './Size'
 import Position from './Position'
 import { Diagonals } from './types'
-import { framePadding, corners } from '../utils/constants'
+import { framePadding } from '../utils/constants'
+import { corners } from '../models/enums'
 
 export default class Frame {
   id: string

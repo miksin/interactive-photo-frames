@@ -1,7 +1,8 @@
 import Position from './Position'
 import { Diagonals } from './types'
-import { IPosition, ISize, IMouseWrapperInput, IQuadrants, IDiagonals } from '../utils/interfaces'
-import { mouseEvents, corners, quadrants } from '../utils/constants'
+import { IMouseWrapperInput } from '../models/interfaces'
+import { quadrants } from '../utils/constants'
+import { mouseEvents, corners } from '../models/enums'
 
 export default class MouseWrapper {
   event: number

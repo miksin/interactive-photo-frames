@@ -83,8 +83,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Ref, Watch } from 'vue-property-decorator'
 import FrameModel from '../models/Frame'
-import { IPosition } from '../utils/interfaces'
-import { mouseEvents, corners } from '../utils/constants'
+import { mouseEvents, corners } from '../models/enums'
 import Position from '../models/Position'
 
 @Component

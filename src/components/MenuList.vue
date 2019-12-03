@@ -34,7 +34,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
-import { IMenuItem, IPosition } from '../utils/interfaces'
+import { IMenuItem, IPosition } from '../models/interfaces'
 
 @Component
 export default class MenuList extends Vue {

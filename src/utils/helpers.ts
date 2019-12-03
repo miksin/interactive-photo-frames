@@ -1,5 +1,5 @@
-import { corners } from './constants'
-import { ISize } from './interfaces'
+import { corners } from '../models/enums'
+import { ISize } from '../models/interfaces'
 
 export function cornerStyles (size: ISize,
   cornerSize: number = 0, cursor: boolean = false) {

@@ -1,34 +1,7 @@
-import { IMenuItem, IQuadrants } from './interfaces'
+import { IMenuItem, IQuadrants } from '../models/interfaces'
+import { menuKeys, corners } from '../models/enums'
 
 export const framePadding = 6
-
-export enum menuKeys {
-  Edit = 'edit',
-  Delete = 'delete',
-  Top = 'top',
-  Forward = 'forward',
-  Backward = 'backward',
-  Bottom = 'bottom'
-}
-
-export enum mouseEvents {
-  None,
-  DragFrameControlPanel,
-  DragFrame,
-  ResizeFrame,
-  DragFrameContent
-}
-
-export enum corners {
-  Left = 'left',
-  LeftTop = 'left-top',
-  Top = 'top',
-  RightTop = 'right-top',
-  Right = 'right',
-  RightBottom = 'right-bottom',
-  Bottom = 'bottom',
-  LeftBottom = 'left-bottom'
-}
 
 export const cornerDiagonals = {
   [corners.Left]: corners.Right,

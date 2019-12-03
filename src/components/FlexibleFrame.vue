@@ -45,11 +45,10 @@
 <script lang="ts">
 import { Component, Prop, Ref, Vue, Watch } from 'vue-property-decorator'
 import FrameModel from '../models/Frame'
-import Size from '../models/Size'
-import { IPosition } from '../utils/interfaces'
 import { cornerStyles } from '../utils/helpers'
-import { corners, mouseEvents } from '../utils/constants'
+import { corners, mouseEvents } from '../models/enums'
 import Position from '../models/Position'
+import Size from '../models/Size'
 
 @Component
 export default class App extends Vue {

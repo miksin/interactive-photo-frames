@@ -23,9 +23,9 @@
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import FlexibleFrame from './FlexibleFrame.vue'
 import FrameModel from '../models/Frame'
-import { IPosition, ISize, IQuadrants, IDiagonals } from '../utils/interfaces'
 import { Diagonals } from '../models/types'
-import { mouseEvents, corners, cornerDiagonals } from '../utils/constants'
+import { cornerDiagonals } from '../utils/constants'
+import { mouseEvents, corners } from '../models/enums'
 import Position from '../models/Position'
 
 @Component({

@@ -3,9 +3,10 @@ import Vuex from 'vuex'
 import Uuid from 'uuid/v4'
 import FrameModel from '../models/Frame'
 import MouseWrapperModel from '../models/MouseWrapper'
-import KeyboardWrapper from '@/models/KeyboardWrapper'
-import { menuItems, menuKeys, mouseEvents } from '../utils/constants'
-import { IFrameInput, ISize, IMenuInfo, IPosition, IMenuItem, IMouseWrapperInput, IDiagonals } from '../utils/interfaces'
+import KeyboardWrapper from '../models/KeyboardWrapper'
+import { menuItems } from '../utils/constants'
+import { menuKeys } from '../models/enums'
+import { IFrameInput, IMenuInfo, IPosition, IMenuItem, IMouseWrapperInput } from '../models/interfaces'
 import { Diagonals } from '@/models/types'
 
 Vue.use(Vuex)

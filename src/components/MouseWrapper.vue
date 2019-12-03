@@ -11,7 +11,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import Position from '../models/Position'
-import { mouseEvents, corners } from '../utils/constants'
+import { mouseEvents, corners } from '../models/enums'
 
 @Component
 export default class MouseWrapper extends Vue {
