@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import Uuid from 'uuid/v4'
 import FrameModel from '../models/Frame'
 import MouseWrapperModel from '../models/MouseWrapper'
+import KeyboardWrapper from '@/models/KeyboardWrapper'
 import { menuItems, menuKeys, mouseEvents } from '../utils/constants'
 import { IFrameInput, ISize, IMenuInfo, IPosition, IMenuItem, IMouseWrapperInput, IDiagonals } from '../utils/interfaces'
 import { Diagonals } from '@/models/types'
@@ -13,7 +14,8 @@ interface IState {
   frames: FrameModel[],
   focusFrame: FrameModel | null,
   menu: IMenuInfo,
-  mouseWrapper: MouseWrapperModel
+  mouseWrapper: MouseWrapperModel,
+  keyboardWrapper: KeyboardWrapper
 }
 
 export default new Vuex.Store({
@@ -28,7 +30,8 @@ export default new Vuex.Store({
         y: 0
       }
     },
-    mouseWrapper: new MouseWrapperModel()
+    mouseWrapper: new MouseWrapperModel(),
+    keyboardWrapper: new KeyboardWrapper()
   },
   mutations: {
     addFrame (state: IState, { input }: { input: IFrameInput }) {
@@ -88,6 +91,15 @@ export default new Vuex.Store({
     },
     resetMouseWrapper (state: IState) {
       state.mouseWrapper.reset()
+    },
+    activateKey (state: IState, { code }: { code: number }) {
+      state.keyboardWrapper.activate(code)
+    },
+    deactivateKey (state: IState, { code }: { code: number }) {
+      state.keyboardWrapper.deactivate(code)
+    },
+    resetKey (state: IState) {
+      state.keyboardWrapper.reset()
     }
   },
   actions: {

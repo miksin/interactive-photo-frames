@@ -1,17 +1,18 @@
 <template>
-  <div class="playground grid">
+  <div class="playground grid" @keydown="handleKeyDown">
     <div
       v-for="frame in frames"
       :key="frame.id"
     >
       <FlexibleFrame
         :class="{
-          dragging: isDragging && mutatedFrame === frame,
-          highlight: isDragging && mutatedFrame === frame
+          highlight: (isDragging || isResizing) && mutatedFrame === frame
         }"
         :frame="frame"
         :focused="focusFrame === frame"
+        :frameMutable="!isAlt"
         @drag-frame="handleDragFrame"
+        @drag-content="handleDragFrameContent"
         @resize-frame="handleResizeFrame"
       />
     </div>
@@ -35,6 +36,10 @@ import Position from '../models/Position'
 export default class Playground extends Vue {
   mutatedFrame: FrameModel | null = null
 
+  get isAlt (): boolean {
+    return this.$store.state.keyboardWrapper.Alt
+  }
+
   get mousePos (): Position {
     return this.$store.state.mouseWrapper.position
   }
@@ -53,6 +58,14 @@ export default class Playground extends Vue {
 
   get isDragging (): boolean {
     return this.dragActive && this.mutatedFrame !== null
+  }
+
+  get dragContentActive (): boolean {
+    return this.$store.state.mouseWrapper.event === mouseEvents.DragFrameContent
+  }
+
+  get isDraggingContent (): boolean {
+    return this.dragContentActive && this.mutatedFrame !== null
   }
 
   get resizeActive (): boolean {
@@ -79,6 +92,21 @@ export default class Playground extends Vue {
     })
   }
 
+  handleDragFrameContent ({ frame, e }: { frame: FrameModel, e: MouseEvent }) {
+    this.mutatedFrame = frame
+    this.$store.commit('setMouseWrapper', {
+      pos: new Position({
+        x: e.clientX,
+        y: e.clientY
+      }),
+      event: mouseEvents.DragFrameContent,
+      basis: new Position({
+        x: e.clientX - frame.offset.x,
+        y: e.clientY - frame.offset.y
+      })
+    })
+  }
+
   @Watch('mousePos')
   handleMouseMove (val: Position) {
     const frame = this.mutatedFrame || new FrameModel()
@@ -90,19 +118,29 @@ export default class Playground extends Vue {
       })
     }
 
+    if (this.isDraggingContent) {
+      this.$store.commit('updateFrame', {
+        frame,
+        input: {
+          offset: val.clone()
+        }
+      })
+    }
+
     if (this.isResizing) {
+      const frameDiagonals = frame.diagonals
       const diagonals = this.mouseDiagonals
 
       // fix horizontal or vertical changes
       switch (this.mouseTrackCorner) {
         case corners.Left:
         case corners.Right:
-          diagonals[0].y = frame.position.y
+          diagonals[0].y = frame.diagonals[0].y
           diagonals[1].y = frame.diagonals[1].y
           break
         case corners.Top:
         case corners.Bottom:
-          diagonals[0].x = frame.position.x
+          diagonals[0].x = frame.diagonals[0].x
           diagonals[1].x = frame.diagonals[1].x
           break
       }
@@ -142,6 +180,10 @@ export default class Playground extends Vue {
       this.mutatedFrame = null
       this.$store.commit('resetMouseWrapper')
     }
+  }
+
+  handleKeyDown (e: any) {
+    console.log(e)
   }
 
   get frames () {

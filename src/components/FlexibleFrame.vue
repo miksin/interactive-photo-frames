@@ -2,7 +2,9 @@
   <div
     class="frame"
     :class="{
-      highlight: focused
+      highlight: focused,
+      draggable: frameMutable,
+      movable: contentMutable
     }"
     :style="{
       transform: `translate(${framePos.x}px, ${framePos.y}px)`,
@@ -12,9 +14,11 @@
     }"
     @mouseover="handleFocusFrame(frame)"
     @mouseout="handleFocusFrame(null)"
-    @mousewheel="handleScrollFrame"
   >
-    <div class="content">
+    <div class="content"
+      @mousedown.stop="handleDragFrame"
+      @mousewheel="handleScrollFrame"
+    >
       <img
         :title="frame.name"
         :src="frame.url"
@@ -25,8 +29,8 @@
           width: `${frame.innerSize.width}px`,
           height: `${frame.innerSize.height}px`,
         }"
-        @mousedown.stop="handleDragFrame"
         @load="handleImgLoad(frame)"
+        @dragstart.prevent=""
       >
       <div
         v-for="node in resizeNodes"
@@ -44,13 +48,14 @@ import FrameModel from '../models/Frame'
 import Size from '../models/Size'
 import { IPosition } from '../utils/interfaces'
 import { cornerStyles } from '../utils/helpers'
-import { corners } from '../utils/constants'
+import { corners, mouseEvents } from '../utils/constants'
 import Position from '../models/Position'
 
 @Component
 export default class App extends Vue {
   @Prop(FrameModel) frame: FrameModel
   @Prop({ default: false }) readonly focused: boolean
+  @Prop() readonly frameMutable: boolean
 
   @Ref('img') readonly imgRef!: HTMLImageElement
 
@@ -59,7 +64,11 @@ export default class App extends Vue {
   }
 
   get resizeNodes () {
-    return cornerStyles(this.frame.size, this.frame.padding)
+    return cornerStyles(this.frame.size, this.frame.padding, this.frameMutable)
+  }
+
+  get contentMutable () {
+    return !this.frameMutable
   }
 
   // resize image after loaded
@@ -82,13 +91,23 @@ export default class App extends Vue {
   }
 
   handleDragFrame (e: MouseEvent) {
-    this.$emit('drag-frame', {
-      frame: this.frame,
-      e
-    })
+    if (this.frameMutable) {
+      this.$emit('drag-frame', {
+        frame: this.frame,
+        e
+      })
+    }
+
+    if (this.contentMutable) {
+      this.$emit('drag-content', {
+        frame: this.frame,
+        e
+      })
+    }
   }
 
   handleResizeFrame (e: MouseEvent, corner: corners) {
+    if (!this.frameMutable) return
     this.$emit('resize-frame', {
       frame: this.frame,
       corner,
@@ -97,7 +116,14 @@ export default class App extends Vue {
   }
 
   handleScrollFrame (e: WheelEvent) {
-    console.log(e.deltaMode, e.deltaY)
+    if (!this.contentMutable) return
+
+    const zoomScale = e.deltaY < 0 ? 0.1 : -0.1
+    const scale = Math.max(this.frame.scale + zoomScale, 0.1)
+    this.$store.commit('updateFrame', {
+      frame: this.frame,
+      input: { scale }
+    })
   }
 }
 </script>
@@ -131,7 +157,14 @@ export default class App extends Vue {
     box-shadow: 0px 0px 0px 3px rgba($color: $danger, $alpha: 1);
   }
 
-  cursor: grab;
+  &.draggable {
+    cursor: grab;
+  }
+
+  &.movable {
+    cursor: move;
+  }
+
   &.dragging {
     opacity: 0.3;
   }

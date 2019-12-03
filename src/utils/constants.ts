@@ -15,7 +15,8 @@ export enum mouseEvents {
   None,
   DragFrameControlPanel,
   DragFrame,
-  ResizeFrame
+  ResizeFrame,
+  DragFrameContent
 }
 
 export enum corners {

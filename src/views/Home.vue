@@ -8,6 +8,7 @@
       :pos="menuPos"
       @click-item="handleMenuItem"
     />
+    <KeyNavigator />
     <MouseWrapper />
   </div>
 </template>
@@ -19,6 +20,7 @@ import Playground from '../components/Playground.vue'
 import FrameControl from '../components/FrameControl.vue'
 import MenuList from '../components/MenuList.vue'
 import MouseWrapper from '../components/MouseWrapper.vue'
+import KeyNavigator from '../components/KeyNavigator.vue'
 import FrameModel from '../models/Frame'
 import { IPosition, IMenuItem } from '../utils/interfaces'
 import { menuKeys } from '../utils/constants'
@@ -28,7 +30,8 @@ import { menuKeys } from '../utils/constants'
     Playground,
     FrameControl,
     MenuList,
-    MouseWrapper
+    MouseWrapper,
+    KeyNavigator
   }
 })
 export default class Home extends Vue {

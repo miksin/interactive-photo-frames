@@ -1,7 +1,8 @@
 import { corners } from './constants'
 import { ISize } from './interfaces'
 
-export function cornerStyles (size: ISize, cornerSize: number = 0) {
+export function cornerStyles (size: ISize,
+  cornerSize: number = 0, cursor: boolean = false) {
   return [
     {
       key: corners.Left,
@@ -11,7 +12,7 @@ export function cornerStyles (size: ISize, cornerSize: number = 0) {
         height: `${size.height}px`,
         left: `${-cornerSize}px`,
         top: `${0}px`,
-        cursor: 'ew-resize'
+        cursor: cursor ? 'ew-resize' : 'default'
       }
     },
     {
@@ -22,7 +23,7 @@ export function cornerStyles (size: ISize, cornerSize: number = 0) {
         height: `${cornerSize}px`,
         left: `${-cornerSize}px`,
         top: `${-cornerSize}px`,
-        cursor: 'nwse-resize'
+        cursor: cursor ? 'nwse-resize' : 'default'
       }
     },
     {
@@ -33,7 +34,7 @@ export function cornerStyles (size: ISize, cornerSize: number = 0) {
         height: `${cornerSize}px`,
         left: `${0}px`,
         top: `${-cornerSize}px`,
-        cursor: 'ns-resize'
+        cursor: cursor ? 'ns-resize' : 'default'
       }
     },
     {
@@ -44,7 +45,7 @@ export function cornerStyles (size: ISize, cornerSize: number = 0) {
         height: `${cornerSize}px`,
         right: `${-cornerSize}px`,
         top: `${-cornerSize}px`,
-        cursor: 'nesw-resize'
+        cursor: cursor ? 'nesw-resize' : 'default'
       }
     },
     {
@@ -55,7 +56,7 @@ export function cornerStyles (size: ISize, cornerSize: number = 0) {
         height: `${size.height}px`,
         right: `${-cornerSize}px`,
         top: `${0}px`,
-        cursor: 'ew-resize'
+        cursor: cursor ? 'ew-resize' : 'default'
       }
     },
     {
@@ -66,7 +67,7 @@ export function cornerStyles (size: ISize, cornerSize: number = 0) {
         height: `${cornerSize}px`,
         right: `${-cornerSize}px`,
         bottom: `${-cornerSize}px`,
-        cursor: 'nwse-resize'
+        cursor: cursor ? 'nwse-resize' : 'default'
       }
     },
     {
@@ -77,7 +78,7 @@ export function cornerStyles (size: ISize, cornerSize: number = 0) {
         height: `${cornerSize}px`,
         left: `${0}px`,
         bottom: `${-cornerSize}px`,
-        cursor: 'ns-resize'
+        cursor: cursor ? 'ns-resize' : 'default'
       }
     },
     {
@@ -88,7 +89,7 @@ export function cornerStyles (size: ISize, cornerSize: number = 0) {
         height: `${cornerSize}px`,
         left: `${-cornerSize}px`,
         bottom: `${-cornerSize}px`,
-        cursor: 'nesw-resize'
+        cursor: cursor ? 'nesw-resize' : 'default'
       }
     }
   ]

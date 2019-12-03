@@ -9,6 +9,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { routes } from './router'
+import { KeyCodes } from './models/enums'
 
 @Component
 export default class App extends Vue {
@@ -17,6 +18,20 @@ export default class App extends Vue {
       path: r.path,
       name: r.name
     }))
+  }
+
+  created () {
+    window.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (Object.keys(KeyCodes).includes(`${e.keyCode}`)) e.preventDefault()
+      this.$store.commit('activateKey', { code: e.keyCode })
+    })
+    window.addEventListener('keyup', (e: KeyboardEvent) => {
+      e.preventDefault()
+      this.$store.commit('deactivateKey', { code: e.keyCode })
+    })
+    window.addEventListener('blur', () => {
+      this.$store.commit('resetKey')
+    })
   }
 }
 </script>
