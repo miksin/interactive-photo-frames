@@ -11,7 +11,6 @@
         }"
         :frame="frame"
         :focused="focusFrame === frame"
-        :padding="framePadding"
         @drag-frame="handleDragFrame"
         @resize-frame="handleResizeFrame"
       />
@@ -24,7 +23,9 @@ import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import FlexibleFrame from './FlexibleFrame.vue'
 import FrameModel from '../models/Frame'
 import { IPosition, ISize, IQuadrants, IDiagonals } from '../utils/interfaces'
-import { mouseEvents, corners, cornerDiagonals, framePadding } from '../utils/constants'
+import { Diagonals } from '../models/types'
+import { mouseEvents, corners, cornerDiagonals } from '../utils/constants'
+import Position from '../models/Position'
 
 @Component({
   components: {
@@ -32,16 +33,13 @@ import { mouseEvents, corners, cornerDiagonals, framePadding } from '../utils/co
   }
 })
 export default class Playground extends Vue {
-  framePadding: number = framePadding
   mutatedFrame: FrameModel | null = null
-  offset: IPosition = { x: 0, y: 0 }
-  resizeCorner: string = corners.LeftTop
 
-  get mousePos (): IPosition {
+  get mousePos (): Position {
     return this.$store.state.mouseWrapper.position
   }
 
-  get mouseDiagonals (): IDiagonals {
+  get mouseDiagonals (): Diagonals {
     return this.$store.state.mouseWrapper.diagonals
   }
 
@@ -68,21 +66,21 @@ export default class Playground extends Vue {
   handleDragFrame ({ frame, e }: { frame: FrameModel, e: MouseEvent }) {
     this.mutatedFrame = frame
     this.$store.commit('setMouseWrapper', {
-      pos: {
+      pos: new Position({
         x: e.clientX,
         y: e.clientY
-      },
-      event: mouseEvents.DragFrame,
-      basis: {
+      }),
+      basis: new Position({
         x: e.clientX - frame.position.x,
         y: e.clientY - frame.position.y
-      },
+      }),
+      event: mouseEvents.DragFrame,
       trackCorner: corners.LeftTop
     })
   }
 
   @Watch('mousePos')
-  handleMouseMove (val: IPosition) {
+  handleMouseMove (val: Position) {
     const frame = this.mutatedFrame || new FrameModel()
 
     if (this.isDragging) {
@@ -99,13 +97,13 @@ export default class Playground extends Vue {
       switch (this.mouseTrackCorner) {
         case corners.Left:
         case corners.Right:
-          diagonals[corners.LeftTop].y = frame.position.y
-          diagonals[corners.RightBottom].y = frame.diagonals[corners.RightBottom].y
+          diagonals[0].y = frame.position.y
+          diagonals[1].y = frame.diagonals[1].y
           break
         case corners.Top:
         case corners.Bottom:
-          diagonals[corners.LeftTop].x = frame.position.x
-          diagonals[corners.RightBottom].x = frame.diagonals[corners.RightBottom].x
+          diagonals[0].x = frame.position.x
+          diagonals[1].x = frame.diagonals[1].x
           break
       }
 
@@ -128,10 +126,10 @@ export default class Playground extends Vue {
     const { frame, corner, e } = input
     this.mutatedFrame = frame
     this.$store.commit('setMouseWrapper', {
-      pos: {
+      pos: new Position({
         x: e.clientX,
         y: e.clientY
-      },
+      }),
       event: mouseEvents.ResizeFrame,
       basis: frame.cornerPositions[cornerDiagonals[corner]],
       trackCorner: cornerDiagonals[corner]

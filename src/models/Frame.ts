@@ -1,5 +1,6 @@
 import uuid from 'uuid/v4'
 import {
+  IPosition,
   IFrameInput,
   IQuadrants,
   IDiagonals
@@ -33,7 +34,7 @@ export default class Frame {
     this.mirror = false
     this.padding = framePadding
     this.scale = 1
-    this.offset = new Size()
+    this.offset = new Position()
 
     if (input) {
       this.update(input)
@@ -44,58 +45,70 @@ export default class Frame {
     return this.size.clone().expand(this.padding)
   }
 
-  get innerSize (): ISize {
-    return this.size.clone().scale(this.scale)
+  set outerSize (val: Size) {
+    this.size = val.clone().expand(-this.padding)
+  }
+
+  get innerSize (): Size {
+    return this.naturalSize.clone().scale(this.scale)
+  }
+
+  set innerSize (val: Size) {
+    this.scale = val.width / this.naturalSize.width
   }
 
   get aspectRatio (): number {
     return this.naturalSize.aspectRatio
   }
 
+  set aspectRatio (val: number) {
+    this.naturalSize.height = this.naturalSize.width / val
+  }
+
   get outerPosition (): Position {
     return this.position.clone().move(-this.padding, -this.padding)
   }
 
+  set outerPosition (val: Position) {
+    this.position.moveTo(val.clone().move(this.padding, this.padding))
+  }
+
   get cornerPositions (): IQuadrants {
-    const diagonal = {
-      x: this.position.x + this.size.width + framePadding * 2,
-      y: this.position.y + this.size.height + framePadding * 2
-    }
+    const diagonal = this.diagonals[1]
 
     return {
-      [corners.Left]: this.position,
-      [corners.LeftTop]: this.position,
-      [corners.Top]: this.position,
-      [corners.RightTop]: {
+      [corners.Left]: this.position.clone(),
+      [corners.LeftTop]: this.position.clone(),
+      [corners.Top]: this.position.clone(),
+      [corners.RightTop]: new Position({
         x: diagonal.x,
         y: this.position.y
-      },
+      }),
       [corners.Right]: diagonal,
       [corners.RightBottom]: diagonal,
       [corners.Bottom]: diagonal,
-      [corners.LeftBottom]: {
+      [corners.LeftBottom]: new Position({
         x: this.position.x,
         y: diagonal.y
-      }
+      })
     }
   }
 
-  get diagonals (): IDiagonals {
-    return {
-      [corners.LeftTop]: this.position,
-      [corners.RightBottom]: {
-        x: this.position.x + this.size.width + framePadding * 2,
-        y: this.position.y + this.size.height + framePadding * 2
-      }
-    }
+  get diagonals (): Diagonals {
+    const pos = this.outerPosition
+    const size = this.outerSize
+    return [
+      pos.clone(),
+      pos.clone().move(size.width, size.height)
+    ]
   }
 
-  set diagonals (val: IDiagonals) {
-    this.position = val[corners.LeftTop]
-    this.size = {
-      width: val[corners.RightBottom].x - val[corners.LeftTop].x - 2 * framePadding,
-      height: val[corners.RightBottom].y - val[corners.LeftTop].y - 2 * framePadding
-    }
+  set diagonals (val: Diagonals) {
+    this.outerPosition = val[0]
+    this.outerSize = new Size({
+      width: val[1].x - val[0].x,
+      height: val[1].y - val[0].y
+    })
   }
 
   update (input: IFrameInput): void {

@@ -6,9 +6,9 @@
     }"
     :style="{
       transform: `translate(${framePos.x}px, ${framePos.y}px)`,
-      width: `${frame.size.width + 2 * padding}px`,
-      height: `${frame.size.height + 2 * padding}px`,
-      padding: `${padding}px`
+      width: `${frame.outerSize.width}px`,
+      height: `${frame.outerSize.height}px`,
+      padding: `${frame.padding}px`
     }"
     @mouseover="handleFocusFrame(frame)"
     @mouseout="handleFocusFrame(null)"
@@ -20,6 +20,11 @@
         :src="frame.url"
         :alt="frame.name"
         ref="img"
+        :style="{
+          transform: `translate(${frame.offset.x}px, ${frame.offset.y}px)`,
+          width: `${frame.innerSize.width}px`,
+          height: `${frame.innerSize.height}px`,
+        }"
         @mousedown.stop="handleDragFrame"
         @load="handleImgLoad(frame)"
       >
@@ -36,39 +41,37 @@
 <script lang="ts">
 import { Component, Prop, Ref, Vue, Watch } from 'vue-property-decorator'
 import FrameModel from '../models/Frame'
+import Size from '../models/Size'
 import { IPosition } from '../utils/interfaces'
 import { cornerStyles } from '../utils/helpers'
 import { corners } from '../utils/constants'
+import Position from '../models/Position'
 
 @Component
 export default class App extends Vue {
   @Prop(FrameModel) frame: FrameModel
   @Prop({ default: false }) readonly focused: boolean
-  @Prop({ default: 0 }) readonly padding: number
 
   @Ref('img') readonly imgRef!: HTMLImageElement
 
-  get framePos (): IPosition {
-    return {
-      x: this.frame.position.x - this.padding,
-      y: this.frame.position.y - this.padding
-    }
+  get framePos (): Position {
+    return this.frame.outerPosition
   }
 
   get resizeNodes () {
-    return cornerStyles(this.frame.size, this.padding)
+    return cornerStyles(this.frame.size, this.frame.padding)
   }
 
   // resize image after loaded
   handleImgLoad (frame: FrameModel) {
-    const naturalSize = {
+    const naturalSize = new Size({
       width: this.imgRef.naturalWidth,
       height: this.imgRef.naturalHeight
-    }
+    })
     this.$store.commit('updateFrame', {
       frame,
       input: {
-        size: naturalSize,
+        size: naturalSize.clone(),
         naturalSize
       }
     })
@@ -118,7 +121,9 @@ export default class App extends Vue {
     position: relative;
 
     img {
-      width: 100%;
+      left: 0;
+      top: 0;
+      position: absolute;
     }
   }
 

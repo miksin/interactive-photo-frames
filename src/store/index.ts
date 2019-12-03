@@ -5,6 +5,7 @@ import FrameModel from '../models/Frame'
 import MouseWrapperModel from '../models/MouseWrapper'
 import { menuItems, menuKeys, mouseEvents } from '../utils/constants'
 import { IFrameInput, ISize, IMenuInfo, IPosition, IMenuItem, IMouseWrapperInput, IDiagonals } from '../utils/interfaces'
+import { Diagonals } from '@/models/types'
 
 Vue.use(Vuex)
 
@@ -45,7 +46,7 @@ export default new Vuex.Store({
     moveFrame (state: IState, { frame, pos }: { frame: FrameModel, pos: IPosition }) {
       frame.move(pos)
     },
-    resizeFrame (state: IState, { frame, val }: { frame: FrameModel, val: IDiagonals }) {
+    resizeFrame (state: IState, { frame, val }: { frame: FrameModel, val: Diagonals }) {
       frame.diagonals = val
     },
     swapFrames (state: IState, { posA, posB }: { posA: number, posB: number }) {

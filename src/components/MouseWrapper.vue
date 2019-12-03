@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { IPosition } from '../utils/interfaces'
+import Position from '../models/Position'
 import { mouseEvents, corners } from '../utils/constants'
 
 @Component
@@ -29,19 +29,19 @@ export default class MouseWrapper extends Vue {
     return this.$store.state.mouseWrapper.trackCorner
   }
 
-  get pos (): IPosition {
+  get pos (): Position {
     return this.$store.state.mouseWrapper.pos
   }
 
-  set pos (val: IPosition) {
+  set pos (val: Position) {
     this.$store.commit('setMouseWrapper', { pos: val })
   }
 
   handleMouseMove (e: MouseEvent) {
-    this.pos = {
+    this.pos = new Position({
       x: e.clientX,
       y: e.clientY
-    }
+    })
   }
 
   handleMouseUp () {

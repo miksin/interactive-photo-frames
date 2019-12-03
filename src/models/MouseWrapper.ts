@@ -1,10 +1,12 @@
+import Position from './Position'
+import { Diagonals } from './types'
 import { IPosition, ISize, IMouseWrapperInput, IQuadrants, IDiagonals } from '../utils/interfaces'
 import { mouseEvents, corners, quadrants } from '../utils/constants'
 
 export default class MouseWrapper {
   event: number
-  pos: IPosition // absolute position of the mouse
-  basis: IPosition // for [position]: relative position
+  pos: Position // absolute position of the mouse
+  basis: Position // for [position]: relative position
   trackCorner: corners // for [position]: relative position
 
   constructor () {
@@ -13,8 +15,8 @@ export default class MouseWrapper {
 
   reset () {
     this.event = mouseEvents.None
-    this.pos = { x: 0, y: 0 }
-    this.basis = { x: 0, y: 0 }
+    this.pos = new Position({ x: 0, y: 0 })
+    this.basis = new Position({ x: 0, y: 0 })
     this.trackCorner = corners.LeftTop
   }
 
@@ -23,60 +25,56 @@ export default class MouseWrapper {
   }
 
   // the mouse position relate to basis and trackCorner
-  get position (): IPosition {
-    return {
+  get position (): Position {
+    return new Position({
       x: (this.pos.x - this.basis.x) * quadrants[this.trackCorner].x,
       y: (this.pos.y - this.basis.y) * quadrants[this.trackCorner].y
-    }
+    })
   }
 
-  get diagonals (): IDiagonals {
+  get diagonals (): Diagonals {
     switch (this.trackCorner) {
       case corners.LeftTop:
-        return {
-          [corners.LeftTop]: this.basis,
-          [corners.RightBottom]: this.pos
-        }
       case corners.Left:
       case corners.Top:
-        return {
-          [corners.LeftTop]: this.basis,
-          [corners.RightBottom]: this.pos
-        }
+        return [
+          this.basis.clone(),
+          this.pos.clone()
+        ]
       case corners.RightBottom:
       case corners.Right:
       case corners.Bottom:
-        return {
-          [corners.LeftTop]: this.pos,
-          [corners.RightBottom]: this.basis
-        }
+        return [
+          this.pos.clone(),
+          this.basis.clone()
+        ]
       case corners.LeftBottom:
-        return {
-          [corners.LeftTop]: {
+        return [
+          new Position({
             x: this.basis.x,
             y: this.pos.y
-          },
-          [corners.RightBottom]: {
+          }),
+          new Position({
             x: this.pos.x,
             y: this.basis.y
-          }
-        }
+          })
+        ]
       case corners.RightTop:
-        return {
-          [corners.LeftTop]: {
+        return [
+          new Position({
             x: this.pos.x,
             y: this.basis.y
-          },
-          [corners.RightBottom]: {
+          }),
+          new Position({
             x: this.basis.x,
             y: this.pos.y
-          }
-        }
+          })
+        ]
       default:
-        return {
-          [corners.LeftTop]: this.basis,
-          [corners.RightBottom]: this.pos
-        }
+        return [
+          this.basis.clone(),
+          this.pos.clone()
+        ]
     }
   }
 }

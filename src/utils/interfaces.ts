@@ -1,15 +1,17 @@
 import FrameModel from '../models/Frame'
+import Position from '../models/Position'
+import Size from '../models/Size'
 import { corners } from './constants'
 
 export interface IFrameInput {
   name?: string,
   url?: string,
-  position?: IPosition,
-  size?: ISize
-  naturalSize?: ISize
+  position?: Position,
+  size?: Size
+  naturalSize?: Size
   padding?: number
   scale?: number
-  offset?: IPosition
+  offset?: Position
 }
 
 export interface ISize {
@@ -42,8 +44,9 @@ export interface IMouseWrapper {
 
 export interface IMouseWrapperInput {
   event?: number,
-  pos?: IPosition,
-  offset?: IPosition
+  pos?: Position,
+  basis?: Position,
+  trackCorner?: corners
 }
 
 export interface IQuadrants {

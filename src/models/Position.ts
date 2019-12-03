@@ -25,7 +25,7 @@ export default class Position {
     return this
   }
 
-  move (to: Position): Position {
+  moveTo (to: Position): Position {
     this.x = to.x
     this.y = to.y
     return this

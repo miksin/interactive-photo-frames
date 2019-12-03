@@ -85,6 +85,7 @@ import { Component, Prop, Vue, Ref, Watch } from 'vue-property-decorator'
 import FrameModel from '../models/Frame'
 import { IPosition } from '../utils/interfaces'
 import { mouseEvents, corners } from '../utils/constants'
+import Position from '../models/Position'
 
 @Component
 export default class FrameControl extends Vue {
@@ -99,7 +100,7 @@ export default class FrameControl extends Vue {
   }
 
   // local states
-  pos: IPosition = { x: 8, y: 8 }
+  pos: Position = new Position({ x: 8, y: 8 })
   fold: boolean = false
   hidden: boolean = false
   blurTimer: any = null
@@ -114,7 +115,7 @@ export default class FrameControl extends Vue {
     return this.$store.state.focusFrame
   }
 
-  get mousePos (): IPosition {
+  get mousePos (): Position {
     return this.$store.state.mouseWrapper.position
   }
 
@@ -129,21 +130,21 @@ export default class FrameControl extends Vue {
 
   handleDragModal (e: MouseEvent) {
     this.$store.commit('setMouseWrapper', {
-      pos: { // update mouse position before active
+      pos: new Position({ // update mouse position before active
         x: e.clientX,
         y: e.clientY
-      },
-      event: mouseEvents.DragFrameControlPanel,
-      basis: {
+      }),
+      basis: new Position({
         x: e.clientX - this.pos.x,
         y: e.clientY - this.pos.y
-      },
+      }),
+      event: mouseEvents.DragFrameControlPanel,
       trackCorner: corners.LeftTop
     })
   }
 
   @Watch('mousePos')
-  handleDraggingModal (val: IPosition) {
+  handleDraggingModal (val: Position) {
     if (this.isDraggingModal) {
       this.pos = val
     }
@@ -202,10 +203,10 @@ export default class FrameControl extends Vue {
         this.$store.commit('addFrame', { input: {
           name: files[i].name,
           url: readerEvent.target.result,
-          position: {
+          position: new Position({
             x: this.frames.length * 20 + 20,
             y: this.frames.length * 20 + 20
-          }
+          })
         } })
 
         // clear <input> after all processes has been done
