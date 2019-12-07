@@ -154,7 +154,6 @@ export default class FrameControl extends Vue {
       const firstNode = this.frameListRef.childNodes[0] as HTMLDivElement
       const targetNode = e.currentTarget as HTMLDivElement
       const topDiff = targetNode.offsetTop - firstNode.offsetTop
-      console.log(topDiff, targetNode)
     }
   }
 
