@@ -182,10 +182,6 @@ export default class Playground extends Vue {
     }
   }
 
-  handleKeyDown (e: any) {
-    console.log(e)
-  }
-
   get frames () {
     return this.$store.state.frames.filter((f: FrameModel) => f.display)
   }
