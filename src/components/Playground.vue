@@ -1,5 +1,5 @@
 <template>
-  <div class="playground grid" @keydown="handleKeyDown">
+  <div class="playground grid">
     <div
       v-for="frame in frames"
       :key="frame.id"
