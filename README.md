@@ -1,5 +1,7 @@
 # Interactive Photo Frames
 
+[![Build Status](https://travis-ci.org/miksin/interactive-photo-frames.svg?branch=master)](https://travis-ci.org/miksin/interactive-photo-frames)
+
 [Live Demo](https://github.com/miksin/interactive-photo-frames)
 
 An interactive in-browser tool for image demonstration.
